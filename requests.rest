@@ -1,0 +1,38 @@
+POST http://localhost:1337/api/v1/login
+Content-Type: application/json
+
+{
+    "email" : "test@mail",
+    "password": "password"
+}
+
+###
+POST http://localhost:1337/api/v1/change_password
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoidXNlcjAiLCJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwiaWF0IjoxNjE4NjcxMTQwfQ.jtnrSK85z4VDpEAXKWic6WWGo77LcZMiH1EjTiv0pq4
+Content-Type: application/json
+
+{
+    "new_password": "password"
+}
+
+
+
+###
+POST http://localhost:6969/api/auth/login
+Content-Type: application/json
+
+{
+    "email" : "test@mail",
+    "password": "password"
+}
+
+###
+POST http://localhost:6969/api/auth/token
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwidXNlcm5hbWUiOiJ1c2VyMCIsImlhdCI6MTYxODY4OTYwM30.jzPHujihHpn7drpzJ-WOE1abxm32xBOawoniM4Zv564"
+}
+###
+GET http://localhost:1337/api/v1/restricted_test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwidXNlcm5hbWUiOiJ1 c2VyMCIsImlhdCI6MTYxODY3NzcxNCwiZXhwIjoxNjE4Njc3NzQ0fQ.WdpRW-0Yh_f4GVXFA8r91Sqm8dXUAXL_3UzNdMLV8yo

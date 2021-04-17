@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const { v4: uuidv4 } = require("uuid");
 const createDB = require("../db/db");
 const db = createDB();
@@ -74,7 +75,6 @@ const changePassword = (request, response) => {
   );
 };
 
-
 const deleteUser = (request, response) => {
   const uuid = request.params.id;
   db.query("delete from users where uuid = $1", [uuid], (error, results) => {
@@ -86,11 +86,19 @@ const deleteUser = (request, response) => {
   });
 };
 
+const authDebug = (req, res) => {
+  res.status(200).json({value: req.user.name})
+}
+
+
+
 module.exports = {
   getUsers,
   getFullUsers,
   getUserById,
   createUser,
   changePassword,
-  deleteUser
+  deleteUser,
+  checkToken,
+  authDebug
 };
