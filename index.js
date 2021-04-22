@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -6,19 +6,21 @@ const cors = require("cors");
 const app = express();
 const PORT = 1337;
 
-app.use(express.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
 app.use(cors());
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb" }));
 
 app.get("/", (request, response) => {
   response.json({ info: "Tavernium Test API" });
 });
 
-app.use('/api/v1', require('./router/user_router'));
+app.use("/api/v1", require("./actions/auth_actions"));
+app.use("/api/v1", require("./actions/account_actions"));
 
 app.listen(PORT, () => {
   console.clear();

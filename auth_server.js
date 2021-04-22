@@ -11,18 +11,32 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
+
+app.post("/api/auth/register", (req, res) => {
+  const { username, mail, password } = req.body;
+  const uuid = uuidv4();
+  db.query(
+    "insert into users(uuid, username, email, password) values($1, $2, $3, $4)",
+    [uuid, username, mail, password]
+  )
+    .then((results) => {
+      res.status(201).json({ message: "User successfully registered" });
+    })
+    .catch((e) => res.status(500).json({ message: "Server error" }));
+});
+
 app.post("/api/auth/login", (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, remember } = req.body;
   db.query(
     "select * from users where email = $1 and password = $2",
     [email, password],
     (error, results) => {
       if (error) {
-        throw error;
+        res.status(500).json({ message: "Server error" });
       } else {
         if (results.rowCount === 0) {
           res.status(401).json({
-            message: "Wrong username or pasword",
+            message: "Invalid mail or pasword",
           });
         } else {
           const { uuid, username } = results.rows[0];
@@ -30,11 +44,14 @@ app.post("/api/auth/login", (req, res) => {
             uuid: uuid,
             username: username,
           });
-          const refreshToken = jwt.sign(
-            { uuid: uuid, username: username },
-            process.env.REFRESH_TOKEN_SECRET
-          );
-          saveRefreshToken(refreshToken);
+          let refreshToken = null;
+          if (remember) {
+            refreshToken = jwt.sign(
+              { uuid: uuid, username: username },
+              process.env.REFRESH_TOKEN_SECRET
+            );
+            saveRefreshToken(refreshToken);
+          }
           res.status(200).json({
             username: username,
             user_id: uuid,
@@ -46,6 +63,7 @@ app.post("/api/auth/login", (req, res) => {
     }
   );
 });
+
 app.post("/api/auth/token", (req, res) => {
   const refreshToken = req.body.token;
 
@@ -64,14 +82,16 @@ app.post("/api/auth/token", (req, res) => {
     res.json({ access_token: accessToken });
   });
 });
-app.delete("/api/auth/logout", (req, res) => {
+
+app.post("/api/auth/logout", (req, res) => {
   const token = req.body.token;
-  db.query("delete from refresh_tokens where token = $1", [token], (err, result) => {
-    if (err) throw err;
-    else {
-      res.status(204).json({message: "Entry deleted."});
-    }
-  })
+  db.query("delete from refresh_tokens where token = $1", [token])
+    .then((results) => {
+      res.status(204).json({ message: "Entry deleted." });
+    })
+    .catch((e) => {
+      res.status(500).json({ message: "Server error" });
+    });
 });
 
 function generateAccessToken(user) {

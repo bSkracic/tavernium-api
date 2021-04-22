@@ -31,8 +31,35 @@ POST http://localhost:6969/api/auth/token
 Content-Type: application/json
 
 {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwidXNlcm5hbWUiOiJ1c2VyMCIsImlhdCI6MTYxODY4OTYwM30.jzPHujihHpn7drpzJ-WOE1abxm32xBOawoniM4Zv564"
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiYzMzMWZjNDctMjQ2ZS00NTRhLTliYTgtYmRmZjM2NGQ5MzJmIiwidXNlcm5hbWUiOiJ1c2VyMCIsImlhdCI6MTYxODgzNDEzOH0.WUCG0hsTf_j4PzU5Z-TvGYxCck2yP6gsy2-iepzPHis"
 }
+
 ###
 GET http://localhost:1337/api/v1/restricted_test
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwidXNlcm5hbWUiOiJ1 c2VyMCIsImlhdCI6MTYxODY3NzcxNCwiZXhwIjoxNjE4Njc3NzQ0fQ.WdpRW-0Yh_f4GVXFA8r91Sqm8dXUAXL_3UzNdMLV8yo
+
+###
+DELETE http://localhost:6969/api/auth/logout
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiMjIwZmI0NmYtOWJjYy00ZDJkLTk4ZjUtZTBhZDFmNDU1Mjg1IiwidXNlcm5hbWUiOiJ1c2VyMCIsImlhdCI6MTYxODY5NTU1OH0.42_CgMRsjUMPjSlGLNRfoLR9xj-07ck3wSwoOjwnN5I"
+}
+
+###
+POST http://localhost:6969/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "Carlo",
+    "password": "password3",    
+    "email": "user0@mail"
+}
+
+###
+POST http://localhost:1337/api/v1/acc/avatar
+Content-Type: application/json
+
+{
+    "user_id": "c331fc47-246e-454a-9ba8-bdff364d932f"
+}
