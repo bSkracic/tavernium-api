@@ -63,3 +63,6 @@ Content-Type: application/json
 {
     "user_id": "c331fc47-246e-454a-9ba8-bdff364d932f"
 }
+
+###
+GET http://localhost:1337/api/v1/campaign/search?term=dwar
