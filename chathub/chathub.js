@@ -1,6 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const createDB = require("../db/db");
-const db = createDB();
+const db = require("../db/db");
 
 const createChathub = (server) => {
   const io = require("socket.io")(server, {

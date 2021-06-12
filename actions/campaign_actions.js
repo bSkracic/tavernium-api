@@ -1,31 +1,17 @@
 const router = require("express").Router();
-const createDB = require("../db/db");
+const db = require("../db/db");
+const checkToken = require('../jwt/jwt');
 
-const db = createDB();
-
-const checkToken = (req, res, next) => {
-  // auth header format: BEARER {token}
-  const authHeaader = req.headers["authorization"];
-  const token = authHeaader.split(" ")[1];
-  if (token === null) return res.sendStatus(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-router.get("/campaign/search", (req, res) => {
-  console.log(req.query.term);
+router.post("/campaign/search", (req, res) => {
   db.query(
-    `select campaigns.id, campaigns.title, campaigns.thematics, users.username from campaigns inner join users on users.uuid = campaigns.user_starter_id where campaigns.title like '${req.query.term}%'`
+    `select * from get_campaignbyname($1, $2)`,
+    [req.query.term, req.body.user_id]
   )
     .then((r) => {
       res.status(200).json(r.rows);
     })
     .catch((e) => {
-      console.log(e);
-      res.status(500);
+      res.sendStatus(500);
     });
 });
 
@@ -37,7 +23,7 @@ router.post("/campaign/user", (req, res) => {
     .then((r) => {
       res.status(200).json(r.rows);
     })
-    .catch(() => res.status(500));
+    .catch(() => res.sendStatus(500));
 });
 
 router.post("/campaign/joined", (req, res) => {
@@ -48,9 +34,46 @@ router.post("/campaign/joined", (req, res) => {
     .then((r) => {
       res.status(200).json(r.rows);
     })
-    .catch((e) => {res.status(500)});
+    .catch((e) => res.sendStatus(500));
 });
 
-// router.post("/campaign/join");
+router.post("/campaign/join", checkToken, (req, res) => {
+  db.query("insert into campaigns_user(user_id, sheet_id, campaign_id) values($1, $2, $3)", 
+  [req.body.user_id, req.body.sheet_id, req.body.campaign_id])
+  .then(() => {
+    res.sendStatus(201);
+  })
+  .catch(() => {
+    res.sendStatus(500);
+  });
+});
+
+router.put("/campaign/edit", (req, res) => {
+  db.query("update campaigns set title = $1, thematics = $2 where id = $3", [req.body.title, req.body.thematics, req.body.id]).then(r => {
+    res.status(200).json('update successful');
+  }).catch(e => {
+    res.sendStatus(500);
+  })
+})
+
+router.post("/campaign/edit", checkToken, (req, res) => {
+  db.query("insert into campaigns(user_starter_id, title, thematics) values($1, $2, $3)", [req.user.uuid, req.body.title, req.body.thematics])
+  .then(() => res.sendStatus(201))
+  .catch((e) => {
+    console.log(e)
+    res.sendStatus(500)
+  })
+})
+
+router.delete("/campaign/edit", checkToken, (req, res) => {
+  db.query("delete from campaigns where id = $1", [req.body.id])
+  .then(r => {
+    res.sendStatus(204);
+  })
+  .catch(e => {
+    console.log(e);
+    res.sendStatus(500);
+  })
+})
 
 module.exports = router;

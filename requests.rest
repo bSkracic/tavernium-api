@@ -66,3 +66,38 @@ Content-Type: application/json
 
 ###
 GET http://localhost:1337/api/v1/campaign/search?term=dwar
+
+
+###
+PUT http://localhost:1337/api/v1/campaign/edit
+Authorization: Bearer 
+Content-Type: application/json
+
+{
+    "id" : 1,
+    "title" : "Title campaign 2",
+    "thematics" : "asdsa"
+}
+
+###
+POST http://localhost:1337/api/v1/campaign/user
+Content-Type: application/json
+
+{
+    "user_id": "86a9f2f2-4330-438a-b3c1-0f48ef4d35c2"
+}
+
+###
+POST http://localhost:6969/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "bob@mail",
+    "password": "password",
+    "remember": true
+}
+
+###
+GET http://localhost:1337/api/v1/sheets/user
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiODZhOWYyZjItNDMzMC00MzhhLWIzYzEtMGY0OGVmNGQzNWMyIiwidXNlcm5hbWUiOiJib2IiLCJpYXQiOjE2MjI4MDA0MDAsImV4cCI6MTYyMjgwMDQzMH0.Of67f0C8fyzKGSW3phCYJLsU2eB_HarD71p02xmAog4

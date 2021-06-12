@@ -26,11 +26,39 @@ create table if not exists campaigns(
     thematics varchar(50)
 );
 
+create type alignment_options as enum ('Lawful Good', 'Lawful Neutral', 'Lawful Evil', 'Neutral Good', 'True Neutral', 'Neutral Evil', 'Chaotic Good', 'Chaotic Neutral', 'Chaotic Evil');
+
+create table if not exists sheets(
+    id serial primary key,
+    user_id varchar(36),
+    class varchar(50),
+    level int,
+    background varchar(50),
+    name varchar(50),
+    race varchar(50),
+    alignment alignment_options,
+    experience_points int,
+    strength int,
+    dexterity int,
+    constitution int,
+    intelligence int,
+    wisdom int,
+    charisma int,
+    bonus int,
+    armor_class int,
+    initiative int,
+    speed int,
+    hp int,
+    constraint fk_campaign_user foreign key (user_id) references users(uuid)
+);
+
 create table if not exists campaigns_user(
     id serial primary key, 
     user_id varchar(36), 
+    sheet_id int,
     campaign_id int, 
     constraint fk_campaign_user foreign key (user_id) references users(uuid),
+    constraint fk_campaign_sheet foreign key (sheet_id) references sheets(id),
     constraint fk_campaign_campaign foreign key (campaign_id) references campaigns(id)
 );
 
@@ -43,20 +71,21 @@ create table if not exists messages(
     constraint fk_message_campaign foreign key (campaign_id) references campaigns(id)
 );
 
-create or replace function set_avataruser1(_uuid varchar(36),  _useriD varchar(36), _image text) 
+create or replace function set_avataruser(_userID varchar(36), _image text) 
 returns integer
 as
 $$
-    declare _uuid text := $1;
-    declare _userID text := $2;
-    declare _image text := $3;
+    declare _userID text := $1;
+    declare _image text := $2;
     declare target_user_id integer;
 begin
-    select count(*) into target_user_id from images where user_id = _userID;
+    select count(*) into target_user_id from avatars where user_id = _userID;
     if target_user_id > 0 then 
-        update images set image = _image where user_id = _userID;
+        update avatars set image = _image where user_id = _userID;
+        return 0;
     else
-        insert into images(uuid, user_id, image) values(_uuid, _userID, _image);
+        insert into avatars(user_id, image) values(_userID, _image);
+        return 0;
     end if;
 end;
 $$LANGUAGE plpgsql;
@@ -74,7 +103,47 @@ begin
     from campaigns  
     inner join users on users.uuid = campaigns.user_starter_id  
     full join campaigns_user on campaigns_user.user_id = userId and campaigns_user.campaign_id = campaigns.id
-    where campaigns.title like concat(term, '%');
+    where campaigns.title like concat(term, '%') and campaigns.user_starter_id != userId;
 end;
 $$
 language plpgsql;
+
+create or replace function save_refresh_token(_uuid varchar(36), _token text)
+returns void
+as 
+$$
+declare _uuid varchar(36) := $1;
+declare _token text := $2;
+declare cnt int;
+begin
+    cnt := (select count(*) from refresh_tokens where refresh_tokens.token = _token);
+    if cnt = 0 then
+        insert into refresh_tokens(uuid, token) values(_uuid, _token);
+        return;
+    else
+        return;
+    end if;
+end;
+$$
+language plpgsql;
+
+-- insert into sheets(
+--     user_id,
+--     class,
+--     level,
+--     background,
+--     name,
+--     race,
+--     alignment,
+--     experience_points,
+--     strength,
+--     dexterity,
+--     constitution,
+--     intelligence,
+--     wisdom,
+--     charisma,
+--     bonus,
+--     armor_class,
+--     initiative,
+--     speed,
+--     hp) values('druid', 1, 'sailor', 'Yeesl', 'high-elf', 'Neutral Good', 500, 12, 14, 16, 14, 12, 16, 2, 17, 2, 30, 15);

@@ -1,12 +1,18 @@
-const Pool = require("pg").Pool;
-const createDB = () => {
-  return new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "tavernium_testdb",
-    password: "supersecretpassword",
-    port: 5432,
-  });
-};
+const {Pool} = require('pg');
 
-module.exports = createDB;
+const pool = new Pool({
+  user: "yqvruzss",
+  host: "tai.db.elephantsql.com",
+  database: "yqvruzss",
+  password: "I1WRfdGsMSvVlULYPfudEHHyQK-00mIi",
+  port: 5432,
+});
+
+module.exports = {
+    query: (text, params) => {
+        return pool.query(text, params)
+            .then(res => {
+                return res;
+            });
+    }
+}

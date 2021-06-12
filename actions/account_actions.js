@@ -1,7 +1,6 @@
 const router = require("express").Router();
-const createDB = require("../db/db");
-const jwt = require("jsonwebtoken");
-const db = createDB();
+const db = require("../db/db");
+const checkToken = require("../jwt/jwt");
 
 // DEBUG
 router.get("/acc/all_avatars", (req, res) => {
@@ -10,14 +9,13 @@ router.get("/acc/all_avatars", (req, res) => {
       res.status(200).json(r.rows);
     })
     .catch((e) => {
-      res.status(500);
+      res.sendStatus(500);
     });
 });
 
 // DEBUG
-
-router.post("/acc/avatar", (req, res) => {
-  const userID = req.body.user_id;
+router.get("/acc/avatar", checkToken, (req, res) => {
+  const userID = req.user.uuid;
 
   db.query("select image from avatars where user_id = $1", [userID])
     .then((results) => {
@@ -32,30 +30,13 @@ router.post("/acc/avatar", (req, res) => {
     });
 });
 
-const checkToken = (req, res, next) => {
-  // auth header format: BEARER {token}
-  const authHeaader = req.headers["authorization"];
-  const token = authHeaader.split(" ")[1];
-  if (token === null) return res.sendStatus(401);
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
 router.put("/acc/avatar", checkToken, (req, res) => {
   db.query("select set_avataruser($1, $2)", [req.user.uuid, req.body.image])
     .then((results) => {
-      if (
-        results.rows[0].set_avataruser === 1 ||
-        results.rows[0].set_avataruser === 1
-      ) {
-        res.status(200);
-      }
+      res.sendStatus(200);
     })
     .catch((e) => {
-      res.status(500);
+      res.status(500).json({message: "Server error."});
     });
 });
 
