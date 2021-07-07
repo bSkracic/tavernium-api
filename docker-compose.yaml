@@ -1,0 +1,44 @@
+version: "3.7"
+
+volumes:
+    dbvolume:
+      name: tavernium-db-volume
+    apivolume:
+      name: tavernium-api-volume
+
+networks:
+  internalnetwork:
+    name: internal-network
+    external: false
+
+services:
+  db:
+    container_name: "tavernium_db"
+    image: postgres:12.0
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - dbvolume:/var/lib/postgresql/data
+      - ./db/scripts:/docker-entrypoint-initdb.d/
+    networks:
+      - internalnetwork
+
+  api:
+    depends_on:
+      - db
+    container_name: "tavernium_api"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - apivolume:/tavernium-api
+    ports:
+      - 8000:8000
+      - 8001:8001
+    networks:
+      - internalnetwork
+    env_file:
+      - .env
